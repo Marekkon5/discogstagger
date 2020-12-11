@@ -32,11 +32,10 @@ jobs:
         args: --release
     
     # Strip and compress with UPX
-    - name: Compress
-      run: strip target/release/discogstaggerrs
-    - uses: gacts/upx@master
+    - uses: joshuarli/strip-upx-action@master
       with:
-        file: 'target/release/discogstaggerrs'
+        infile: 'target/release/discogstaggerrs'
+        strip_args: '--strip-all'
         upx_args: '-9'
     
     #Upload
@@ -44,4 +43,38 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: discogstagger-linux
+        path: target/release/discogstaggerrs
+
+  build-mac:
+    name: Compile binaries for Mac
+    runs-on: macos-latest
+
+    steps:
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    
+    #Cargo build release
+    - name: Compile
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release
+    
+    # Strip and compress with UPX
+    - uses: joshuarli/strip-upx-action@master
+      with:
+        infile: 'target/release/discogstaggerrs'
+        strip_args: '--strip-all'
+        upx_args: '-9'
+    
+    #Upload
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: discogstagger-mac
         path: target/release/discogstaggerrs
