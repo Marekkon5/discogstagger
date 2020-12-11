@@ -38,7 +38,8 @@ upx -9 discogstaggerrs
 
 ## Credits
 
-BasCurtiz - Request, idea, tester.
+BasCurtiz - Request, idea, tester, trailer.  
+Trailer: https://youtu.be/UA3Pnu1QCsY
 
 ## Support
 

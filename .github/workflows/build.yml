@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
 
   build-linux:
-    name: Compile binaries for Linux
+    name: Linux
     runs-on: ubuntu-latest
 
     steps:
@@ -47,7 +47,7 @@ jobs:
         path: target/release/discogstaggerrs
 
   build-mac:
-    name: Compile binaries for Mac
+    name: Mac
     runs-on: macos-latest
 
     steps:
@@ -76,7 +76,7 @@ jobs:
         brew install upx
         strip target/release/discogstaggerrs
         upx -9 target/release/discogstaggerrs
-        
+
     # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
@@ -85,7 +85,7 @@ jobs:
         path: target/release/discogstaggerrs
 
   build-win:
-    name: Compile binaries for Windows
+    name: Windows
     runs-on: windows-latest
 
     steps:

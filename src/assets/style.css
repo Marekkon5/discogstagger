@@ -444,3 +444,7 @@ h2 {
     bottom: 0px;
     width: 100%;
 }
+
+#token {
+    font-size: 11;
+}
