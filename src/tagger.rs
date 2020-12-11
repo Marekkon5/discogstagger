@@ -196,8 +196,12 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
         }
     }
     if config.genre {
-        vorbis.set("GENRE", release.genres.to_owned());
-        vorbis.set("STYLE", release.styles.to_owned());
+        let mut genres = release.genres.clone();
+        let mut styles = release.styles.clone();
+        genres.sort();
+        styles.sort();
+        vorbis.set("GENRE", genres);
+        vorbis.set("STYLE", styles);
     }
     if config.track {
         vorbis.set_track(track.position_int as u32);
@@ -259,9 +263,13 @@ fn write_mp3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, relea
     }
     if config.genre {
         if config.use_styles {
-            tag.set_genre(release.styles.join(", "));
+            let mut styles = release.styles.clone();
+            styles.sort();
+            tag.set_genre(styles.join(", "));
         } else {
-            tag.set_genre(release.genres.join(", "));
+            let mut genres = release.genres.clone();
+            genres.sort();
+            tag.set_genre(genres.join(", "));
         }
     }
     if config.track {
