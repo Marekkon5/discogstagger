@@ -14,6 +14,7 @@ jobs:
         sudo apt update
         sudo apt install -y libwebkit2gtk-4.0-dev
 
+    # Get repo
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -24,7 +25,7 @@ jobs:
         toolchain: stable
         override: true
     
-    #Cargo build release
+    # Cargo build release
     - name: Compile
       uses: actions-rs/cargo@v1
       with:
@@ -38,7 +39,7 @@ jobs:
         strip_args: '--strip-all'
         upx_args: '-9'
     
-    #Upload
+    # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
@@ -51,6 +52,10 @@ jobs:
 
     steps:
 
+    # Get repo
+    - name: Checkout
+      uses: actions/checkout@v2
+
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -58,7 +63,7 @@ jobs:
         toolchain: stable
         override: true
     
-    #Cargo build release
+    # Cargo build release
     - name: Compile
       uses: actions-rs/cargo@v1
       with:
@@ -72,7 +77,7 @@ jobs:
         strip_args: '--strip-all'
         upx_args: '-9'
     
-    #Upload
+    # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
