@@ -76,7 +76,7 @@ jobs:
         brew install upx
         strip target/release/discogstaggerrs
         upx -9 target/release/discogstaggerrs
-    
+        
     # Upload
     - name: Upload
       uses: actions/upload-artifact@v2

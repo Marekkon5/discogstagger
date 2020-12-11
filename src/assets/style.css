@@ -226,6 +226,46 @@ h2 {
     text-indent: 3%;
 }
 
+.text-input-edit {
+    margin-top: 0px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    color: #A2A2A2;
+    text-transform: uppercase;
+    font-size: 14;
+    text-indent: 11PX;
+    margin-bottom: 7px;
+    padding-top: 0px;
+    padding-bottom: 2;
+}
+
+.text-input-edit input:focus {
+    border-color: white;
+    border-radius: 0;
+    border-width: 1;
+    transition: all 0.3s ease-out;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+}
+
+.text-input-edit input {
+    width: 260px;
+    height: 24px;
+    background-color: #2a2a2a;
+    position: absolute;
+    margin-top: -4px;
+    border: 1px solid #333333;
+    border-radius: 0px;
+    color: #16AADF;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14;
+    left: 96px;
+    font-weight: 700;
+    text-indent: 3%;
+}
+
 .settings-container {
     text-align: left;
     left: 16px;
@@ -328,8 +368,8 @@ h2 {
     font-weight: 400;
     text-indent: 10px;
     font-size: 16px;
-    width: 13em;
-    padding-bottom: 2px;
+    width: 20em;
+    padding-bottom: 5px;
     padding-top: 2px;
 }
 

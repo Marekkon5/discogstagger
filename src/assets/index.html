@@ -13,7 +13,7 @@
         <h2>Input</h2>
         <div style="padding-top: 6px;">
             <input type="text" id="path" class="path-input">
-            <button class='button-browse' onclick="browse()" style="letter-spacing: 5px;">&bull;&bull;&bull;</button>
+            <button class="button-browse" onclick="browse()" style="letter-spacing: 5px;">&bull;&bull;&bull;</button>
         </div>
         <h2>Settings</h2>
         <div class="checkbox-container circular-container">
@@ -30,7 +30,7 @@
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
-        <div class="text-input" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
+        <div class="text-input-edit" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
             <label for="token">Token:</label>
             <input type="text" id="token" value="###TOKEN###">
         </div>
@@ -74,14 +74,14 @@
         <div class="checkbox-container-edit circular-container">
             <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
                 <input type="checkbox" id="genre" checked="">
-                <label for="genre" class="checkbox-label">Genre</label>
+                <label for="genre" class="checkbox-label">Genre + Style</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container-edit circular-container">
             <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
                 <input type="checkbox" id="date">
-                <label for="date" class="checkbox-label">Release Date</label>
+                <label for="date" class="checkbox-label">Original Year</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
@@ -104,7 +104,6 @@
         </div>
     </div>
 </body>
-
 <script>
     var ws;
 
@@ -151,7 +150,7 @@
         data['action'] = action;
         ws.send(JSON.stringify(data));
     }
-    
+
     function start() {
         if (!document.getElementById("token").value || document.getElementById("token").value.length < 6) {
             alert('Enter valid token!');
@@ -160,11 +159,11 @@
 
         emit('start', {'config': getConfig()});
     }
-    
+
     function browse() {
         emit('browse');
     }
-    
+
     function getConfig() {
         return {
             "path": document.getElementById("path").value,
@@ -183,8 +182,8 @@
             "fuzziness": document.getElementById("fuzziness").value.toString()
         }
     }
-    
-    
+
+
     function updateProgress(ok, fail, total) {
         var progress = document.getElementById("progress");
         if (total == 0) {
@@ -203,6 +202,6 @@
             alert('Done!');
         }
     }
-    
+
 </script>     
 </html>

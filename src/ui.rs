@@ -29,7 +29,7 @@ pub fn start_ui() {
         .title("Discogs Tagger")
         .size(400, 806)
         .resizable(false)
-        .debug(true)
+        .debug(false)
         .build()
         .unwrap();
 
