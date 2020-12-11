@@ -71,11 +71,11 @@ jobs:
         args: --release
     
     # Strip and compress with UPX
-    - uses: joshuarli/strip-upx-action@master
-      with:
-        infile: 'target/release/discogstaggerrs'
-        strip_args: '--strip-all'
-        upx_args: '-9'
+    - name: Compress
+      run: |
+        brew install upx
+        strip --strip-all target/release/discogstaggerrs
+        upx -9 target/release/discogstaggerrs
     
     # Upload
     - name: Upload
