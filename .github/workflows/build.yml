@@ -12,7 +12,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y libsdl-pango-dev 
+        sudo apt install -y libwebkit2gtk-4.0-dev
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -38,3 +38,10 @@ jobs:
       with:
         file: 'target/release/discogstaggerrs'
         upx_args: '-9'
+    
+    #Upload
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: discogstagger-linux
+        path: target/release/discogstaggerrs
