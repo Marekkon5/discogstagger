@@ -1,6 +1,8 @@
-# Discogs Tagger
+# ![Logo](https://raw.githubusercontent.com/Marekkon5/discogstagger/main/src/assets/icon64.png) Discogs Tagger
 
 Simple Rust + Webview app to automatically tag your music collection using data from Discogs.
+
+![Screenshot](https://raw.githubusercontent.com/Marekkon5/discogstagger/main/src/assets/screenshot.png)
 
 ## How to use
 
@@ -39,7 +41,8 @@ upx -9 discogstaggerrs
 ## Credits
 
 BasCurtiz - Request, idea, tester, trailer.  
-Trailer: https://youtu.be/UA3Pnu1QCsY
+Trailer: https://youtu.be/UA3Pnu1QCsY  
+Strictness comparison: https://docs.google.com/spreadsheets/d/1s13-tgcEAF1sete1nBYj9S9eDY1BiZqhcXWevt47s4w/edit?usp=sharing
 
 ## Support
 
