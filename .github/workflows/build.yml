@@ -74,7 +74,7 @@ jobs:
     - name: Compress
       run: |
         brew install upx
-        strip --strip-all target/release/discogstaggerrs
+        strip target/release/discogstaggerrs
         upx -9 target/release/discogstaggerrs
     
     # Upload
@@ -83,3 +83,40 @@ jobs:
       with:
         name: discogstagger-mac
         path: target/release/discogstaggerrs
+
+  build-win:
+    name: Compile binaries for Windows
+    runs-on: windows-latest
+
+    steps:
+
+    # Get repo
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    
+    # Cargo build release
+    - name: Compile
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release
+    
+    # Compress with UPX
+    - name: Compress
+      run: |
+        choco install upx
+        upx -9 target\\release\\discogstaggerrs
+    
+    # Upload
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: discogstagger-win
+        path: target\\release\\discogstaggerrs
