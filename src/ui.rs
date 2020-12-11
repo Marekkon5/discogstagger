@@ -26,7 +26,7 @@ pub fn start_ui() {
         .invoke_handler(|_, __| Ok(()))
         .content(web_view::Content::Html(content))
         .user_data(())
-        .title("Discogs Tagger.rs")
+        .title("Discogs Tagger")
         .size(400, 806)
         .resizable(false)
         .debug(true)

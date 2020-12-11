@@ -112,11 +112,11 @@ jobs:
     - name: Compress
       run: |
         choco install upx
-        upx -9 target\release\discogstaggerrs
+        upx -9 target\release\discogstaggerrs.exe
     
     # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: discogstagger-win
-        path: target\release\discogstaggerrs
+        path: target\release\discogstaggerrs.exe
