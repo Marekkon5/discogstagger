@@ -1,0 +1,35 @@
+name: Build
+on: [push, pull_request]
+
+jobs:
+
+  build-linux:
+    name: Compile binaries for Linux
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    
+    #Cargo build release
+    - name: Compile
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release
+    
+    # Strip and compress with UPX
+    - name: Compress
+      run: strip target/release/discogstaggerrs
+    - uses: gacts/upx@master
+      with:
+        file: 'target/release/discogstaggerrs'
+        upx_args: '-9'

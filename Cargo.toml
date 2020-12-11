@@ -1,0 +1,36 @@
+[package]
+name = "discogstaggerrs"
+version = "0.1.0"
+authors = ["Marekkon5"]
+edition = "2018"
+build = "src/build.rs"
+
+[dependencies]
+reqwest = { version = "0.10", features = ["blocking", "json"] }
+url = "2.2.0"
+serde_json = "1.0.59"
+chrono = "0.4.19"
+walkdir = "2.3.1"
+id3 = "0.5.1"
+tinyfiledialogs = "3.3.10"
+tungstenite = "0.11.1"
+crossterm = "0.18.2"
+metaflac = "0.2.4"
+strsim = "0.10.0"
+regex = "1.4.2"
+web-view = "0.7.2"
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
+# Optimize for size, speed doesn't matter due to rate limiting
+# For smaller size use: `strip discogstaggerrs` (Linux/Mac)
+# `upx -9 discogstaggerrs` - compress, any OS
+
+[profile.release]
+opt-level = 'z'
+lto = true
+codegen-units = 1
+# panic = 'abort'
+
+# More: https://github.com/johnthagen/min-sized-rust

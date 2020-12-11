@@ -1,0 +1,208 @@
+<html>
+<head>
+    <link rel='icon' type='image/png' href='/favicon.png'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta charset="ISO-8859-1"> 
+    <link href='style.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
+</head>
+<body>
+    <h1></h1>
+    <div class='content'>
+        <h2>Input</h2>
+        <div style="padding-top: 6px;">
+            <input type="text" id="path" class="path-input">
+            <button class='button-browse' onclick="browse()" style="letter-spacing: 5px;">&bull;&bull;&bull;</button>
+        </div>
+        <h2>Settings</h2>
+        <div class="checkbox-container circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="art">
+                <label for="art" class="checkbox-label">Replace Album Art </label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="styles">
+                <label for="styles" class="checkbox-label">Use styles instead of genres (MP3) </label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="text-input" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
+            <label for="token">Token:</label>
+            <input type="text" id="token" value="###TOKEN###">
+        </div>
+        <div class="text-input" style="font-family: 'Roboto', sans-serif;">
+            <label for="separator">Artist Separator (MP3):</label>
+            <input type="text" id="separator" value="; ">
+        </div>
+        <div class="text-input" style="margin-top: -1px; font-family: 'Roboto', sans-serif;">
+            <label for="fuzziness">Strictness (%):</label>
+            <input type="number" id="fuzziness" value="80" min="10" max="100" step="1" style="margin-top: -2px;">
+        </div>
+        <h3>Tags</h3>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="title">
+                <label for="title" class="checkbox-label">Title</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="artist">
+                <label for="artist" class="checkbox-label">Artists</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="album">
+                <label for="album" class="checkbox-label">Album</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="label">
+                <label for="label" class="checkbox-label">Label</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="genre" checked="">
+                <label for="genre" class="checkbox-label">Genre</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="date">
+                <label for="date" class="checkbox-label">Release Date</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <div class="checkbox-container-edit circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="track">
+                <label for="track" class="checkbox-label">Track Number</label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+    </div>
+    <button class='button-start' onclick='start()' style="line-height: 20px; font-family: 'Roboto', sans-serif; font-weight: 400;" id='startButton'>START</button>
+    <br>
+    <div class='bottom-bar'>
+        <progress id='progress' class='progress' value='0' max='100'></progress>
+        <br>
+        <br>
+        <div class='progression' style="font-family: 'Roboto', sans-serif;">
+            <span style="font-family: 'Roboto', sans-serif; font-weight: 400; font-size: 13; color: #A2A2A2;">PROGRESS: <span id="percent">0</span>%&nbsp; &nbsp; SUCCESSFUL: <span id="success">0</span>&nbsp; &nbsp; FAILED: <span id="fail">0</span></span>
+        </div>
+    </div>
+</body>
+
+<script>
+    var ws;
+
+    function initSocket() {
+        if (ws && ws.readyState == 1) return;
+
+        ws = new WebSocket("ws://localhost:36959");
+        ws.addEventListener('close', initSocket);
+        ws.addEventListener('message', function (event) {
+            var data = JSON.parse(event.data);
+            //Update path
+            if (data.action == 'path') {
+                document.getElementById("path").value = data.path;
+            }
+            //Update progress
+            if (data.action == 'progress') {
+                updateProgress(data.ok, data.fail, data.total);
+            }
+            //Show alert
+            if (data.action == 'alert') {
+                alert(data.msg);
+            } 
+        });
+        //Toggle start/stop button
+        ws.addEventListener('button', function (event) {
+            document.getElementById("startButton").disabled = !document.getElementById("startButton").disabled;
+        });
+    }
+
+    initSocket();
+
+    function emit(action, data) {
+        //Wait for connection
+        if (ws.readyState != 1) {
+            setTimeout(function() {
+                emit(action, data);
+            }, 50);
+            return;
+        }
+        //Send JSON
+        if (!data) {
+            data = {};
+        }
+        data['action'] = action;
+        ws.send(JSON.stringify(data));
+    }
+    
+    function start() {
+        if (!document.getElementById("token").value || document.getElementById("token").value.length < 6) {
+            alert('Enter valid token!');
+            return;
+        }
+
+        emit('start', {'config': getConfig()});
+    }
+    
+    function browse() {
+        emit('browse');
+    }
+    
+    function getConfig() {
+        return {
+            "path": document.getElementById("path").value,
+            "title": document.getElementById("title").checked,
+            "album": document.getElementById("album").checked,
+            "artist": document.getElementById("artist").checked,
+            "track": document.getElementById("track").checked,
+            "genre": document.getElementById("genre").checked,
+            "date": document.getElementById("date").checked,
+            "label": document.getElementById("label").checked,
+            "separator": document.getElementById("separator").value,
+            "token": document.getElementById("token").value,
+            "styles": document.getElementById("styles").checked,
+            "art": document.getElementById("art").checked,
+            //Using toString so it is ALWAYS string
+            "fuzziness": document.getElementById("fuzziness").value.toString()
+        }
+    }
+    
+    
+    function updateProgress(ok, fail, total) {
+        var progress = document.getElementById("progress");
+        if (total == 0) {
+            progress.value = 0;
+            return;
+        }
+        //Update %
+        var percent = ((ok + fail) / total) * 100;
+        progress.value = percent;
+        //Update n
+        document.getElementById("success").innerText = ok;
+        document.getElementById("fail").innerText = fail;
+        document.getElementById("percent").innerText = Math.round(percent);
+        //On done
+        if (percent >= 100) {
+            alert('Done!');
+        }
+    }
+    
+</script>     
+</html>
