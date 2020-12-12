@@ -35,7 +35,8 @@ pub struct TaggerConfig {
     //Other
     pub artist_separator: String,
     pub fuzziness: u8,
-    pub use_styles: bool
+    pub use_styles: bool,
+    pub overwrite: bool
 }
 
 pub fn match_track(discogs: &mut Discogs, info: &MusicFileInfo, fuzziness: u8) -> Result<Option<(Track, ReleaseMaster)>, Box<dyn std::error::Error>> {
@@ -100,13 +101,13 @@ fn clean_title(title: &str, matching: bool) -> String {
     out.to_string()
 }
 
-//Simple one-liner
 pub fn get_files(path: &str) -> Vec<MusicFileInfo> {
+    //Supported extensions
+    let supported_extensions = vec![".mp3", ".flac"];
     //List of filenames of supported formats for path
     WalkDir::new(path).into_iter().filter(
         |e| e.is_ok() && 
-        e.as_ref().unwrap().path().to_str().unwrap().to_ascii_lowercase().ends_with(".mp3") ||
-        e.as_ref().unwrap().path().to_str().unwrap().to_ascii_lowercase().ends_with(".flac")
+        supported_extensions.iter().any(|&i| e.as_ref().unwrap().path().to_str().unwrap().to_ascii_lowercase().ends_with(i))
     ).map(|e| e.unwrap().path().to_str().unwrap().to_owned())
     //Load info
     .filter_map(|f| {
@@ -119,14 +120,15 @@ pub fn get_files(path: &str) -> Vec<MusicFileInfo> {
 
 //Wrapper to load by format
 pub fn load_file_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>> {
-    if path.to_ascii_lowercase().ends_with(".mp3") {
-        return load_mp3_info(path);
+    if path.to_ascii_lowercase().ends_with(".flac") {
+        return load_flac_info(path);
     }
-    return load_flac_info(path);
+
+    return load_id3_info(path);   
 }
 
 //Load ID3 metadata from MP3
-fn load_mp3_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>> {
+fn load_id3_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>> {
     let tag = Tag::read_from_path(path)?;
 
     Ok(MusicFileInfo {
@@ -159,12 +161,14 @@ fn load_flac_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error
 
 //Wrapper to write tags by format
 pub fn write_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
-    if path.to_ascii_lowercase().ends_with(".mp3") {
-        write_mp3_tag(discogs, config, path, release, track)?;
-    }
     if path.to_ascii_lowercase().ends_with(".flac") {
         write_flac_tag(discogs, config, path, release, track)?;
+        return Ok(())
     }
+
+    //ID3 = MP3
+    write_id3_tag(discogs, config, path, release, track)?;
+    
     Ok(())
 }
 
@@ -173,20 +177,20 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
     let vorbis = tag.vorbis_comments_mut();
 
     //Tags
-    if config.title {
+    if config.title && config.overwrite {
         vorbis.set_title(vec![track.title.to_owned()]);
     }
-    if config.album {
+    if config.album && (config.overwrite || vorbis.album().is_none()) {
         vorbis.set_album(vec![release.title.to_owned()]);
     }
-    if config.artist {
+    if config.artist && config.overwrite {
         vorbis.set_artist(track.artists.as_ref().unwrap_or(release.artists.as_ref().unwrap())
             .into_iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>());
     }
-    if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 {
+    if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || vorbis.get("LABEL").is_none()) {
         vorbis.set("LABEL", vec![release.label.as_ref().unwrap().first().unwrap()]);
     }
-    if config.date {
+    if config.date && (config.overwrite || vorbis.get("DATE").is_none()) {
         if release.released.is_some() {
             vorbis.set("DATE", vec![release.released.to_owned().unwrap()]);
         } else {
@@ -196,18 +200,24 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
         }
     }
     if config.genre {
+        //Sort
         let mut genres = release.genres.clone();
         let mut styles = release.styles.clone();
         genres.sort();
         styles.sort();
-        vorbis.set("GENRE", genres);
-        vorbis.set("STYLE", styles);
+        //Write
+        if config.overwrite || vorbis.get("GENRE").is_none() {
+            vorbis.set("GENRE", genres);
+        }
+        if config.overwrite || vorbis.get("STYLE").is_none() {
+            vorbis.set("STYLE", styles);
+        }
     }
-    if config.track {
+    if config.track && (config.overwrite || vorbis.track().is_none()) {
         vorbis.set_track(track.position_int as u32);
     }
     //Art
-    if config.art && release.art_url.is_some() {
+    if config.art && release.art_url.is_some() && (config.overwrite || tag.pictures().count() == 0) {
         match discogs.download_art(release.art_url.as_ref().unwrap()) {
             Ok(data) => {
                 tag.remove_picture_type(FLACPictureType::CoverFront);
@@ -222,23 +232,23 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
     Ok(())
 }
 
-fn write_mp3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
+fn write_id3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
     let mut tag = Tag::read_from_path(path)?;
     //Tags
-    if config.title {
+    if config.title && config.overwrite {
         tag.set_title(&track.title);
     }
-    if config.album {
+    if config.album && (config.overwrite || tag.album().is_none()) {
         tag.set_album(&release.title);
     }
-    if config.artist {
+    if config.artist && config.overwrite {
         tag.set_artist(track.artists.as_ref().unwrap_or(release.artists.as_ref().unwrap())
             .into_iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>().join(&config.artist_separator));
     }
-    if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 {
+    if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || tag.get("TPUB").is_none()) {
         tag.set_text("TPUB", release.label.as_ref().unwrap().first().unwrap());
     }
-    if config.date && release.year.is_some() {
+    if config.date && release.year.is_some() && (config.overwrite || tag.date_released().is_none()) {
         //Parse date
         let mut month = None;
         let mut day = None;
@@ -261,7 +271,7 @@ fn write_mp3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, relea
             second: None
         })
     }
-    if config.genre {
+    if config.genre && (config.overwrite || tag.genre().is_none()) {
         if config.use_styles {
             let mut styles = release.styles.clone();
             styles.sort();
@@ -272,11 +282,11 @@ fn write_mp3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, relea
             tag.set_genre(genres.join(", "));
         }
     }
-    if config.track {
+    if config.track && (config.overwrite || tag.track().is_none()) {
         tag.set_track(track.position_int as u32);
     }
     //Art
-    if config.art && release.art_url.is_some() {
+    if config.art && release.art_url.is_some() && (config.overwrite || tag.pictures().count() == 0) {
         match discogs.download_art(release.art_url.as_ref().unwrap()) {
             Ok(data) => {
                 tag.remove_picture_by_type(ID3PictureType::CoverFront);

@@ -30,6 +30,14 @@
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
+        <div class="checkbox-container circular-container">
+            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+                <input type="checkbox" id="overwrite" checked>
+                <label for="overwrite" class="checkbox-label">Overwrite Tags </label>
+                <span class="checkbox-custom circular"></span>
+            </label>
+        </div>
+        <br>
         <div class="text-input-edit" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
             <label for="token">Token:</label>
             <input type="text" id="token" value="###TOKEN###">
@@ -178,8 +186,9 @@
             "token": document.getElementById("token").value,
             "styles": document.getElementById("styles").checked,
             "art": document.getElementById("art").checked,
+            "overwrite": document.getElementById("overwrite").checked,
             //Using toString so it is ALWAYS string
-            "fuzziness": document.getElementById("fuzziness").value.toString()
+            "fuzziness": document.getElementById("fuzziness").value.toString(),
         }
     }
 

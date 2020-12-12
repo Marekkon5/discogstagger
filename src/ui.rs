@@ -98,7 +98,8 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
                 artist_separator: String::from(config_data["separator"].as_str().unwrap()),
                 fuzziness: config_data["fuzziness"].as_str().unwrap_or("80").parse().unwrap_or(80) as u8,
                 use_styles: config_data["styles"].as_bool().unwrap(),
-                art: config_data["art"].as_bool().unwrap()
+                art: config_data["art"].as_bool().unwrap(),
+                overwrite: config_data["overwrite"].as_bool().unwrap()
             };
             //Create discogs
             match Discogs::new() {
@@ -238,6 +239,8 @@ fn print_console_done(ok: i32, fail: i32, total: i32, ts_start: u64) {
         ResetColor,
         SetAttribute(Attribute::Bold),
         Print("====================================\n"),
+        SetAttribute(Attribute::Reset),
+        ResetColor,
     ).ok();
 }
 
