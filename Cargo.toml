@@ -2,6 +2,12 @@
 name = "discogstaggerrs"
 version = "0.1.2"
 authors = ["Marekkon5"]
+license = "MIT"
+description = "Tool to tag your audio library using data from Discogs"
+homepage = "https://github.com/Marekkon5/discogstagger"
+repository = "https://github.com/Marekkon5/discogstagger"
+keywords = ["gui", "audio"]
+categories = ["multimedia::audio"]
 edition = "2018"
 build = "src/build.rs"
 
