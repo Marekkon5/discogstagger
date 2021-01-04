@@ -6,9 +6,13 @@
     <link href='style.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
 </head>
 <body>
     <h1></h1>
+    <div class="help" input type="button" id="help">
+        <a href="#" style="font-size: 10px; color: #8c8c8c;">Help</a> 
+    </div>
     <div class='content'>
         <h2>Input</h2>
         <div style="padding-top: 6px;">
@@ -17,91 +21,121 @@
         </div>
         <h2>Settings</h2>
         <div class="checkbox-container circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="art">
                 <label for="art" class="checkbox-label">Replace Album Art </label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
-                <input type="checkbox" id="styles">
-                <label for="styles" class="checkbox-label">Use styles instead of genres (MP3) </label>
+            <label class="checkbox-label">&nbsp; &nbsp;
+                <input type="checkbox" id="overwrite">
+                <label for="overwrite" class="checkbox-label">Overwrite Tags</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
-        <div class="checkbox-container circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
-                <input type="checkbox" id="overwrite" checked>
-                <label for="overwrite" class="checkbox-label">Overwrite Tags </label>
-                <span class="checkbox-custom circular"></span>
-            </label>
-        </div>
-        <br>
+        <div style="clear:both;"></div>
         <div class="text-input-edit" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
             <label for="token">Token:</label>
             <input type="text" id="token" value="###TOKEN###">
         </div>
         <div class="text-input" style="font-family: 'Roboto', sans-serif;">
-            <label for="separator">Artist Separator (MP3):</label>
+            <label for="separator">Artist Separator:</label>
             <input type="text" id="separator" value="; ">
         </div>
         <div class="text-input" style="margin-top: -1px; font-family: 'Roboto', sans-serif;">
             <label for="fuzziness">Strictness (%):</label>
             <input type="number" id="fuzziness" value="80" min="10" max="100" step="1" style="margin-top: -2px;">
         </div>
+        <div>
+            <div class="id3">ID3v2.3</div>
+            <div class="toggle">
+                <!-- Rounded switch -->
+                <label class="switch">
+                    <input type="checkbox" id="id3v23">
+                    <div class="slider round"></div>                         
+                </label>
+            </div>
+        </div>             
         <h3>Tags</h3>
         <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="title">
                 <label for="title" class="checkbox-label">Title</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="artist">
                 <label for="artist" class="checkbox-label">Artists</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="album">
                 <label for="album" class="checkbox-label">Album</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="label">
                 <label for="label" class="checkbox-label">Label</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
-                <input type="checkbox" id="genre" checked="">
-                <label for="genre" class="checkbox-label">Genre + Style</label>
-                <span class="checkbox-custom circular"></span>
-            </label>
-        </div>
-        <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="date">
                 <label for="date" class="checkbox-label">Original Year</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
         <div class="checkbox-container-edit circular-container">
-            <label class="checkbox-label">&nbsp; &nbsp;&nbsp;
+            <label class="checkbox-label">&nbsp; &nbsp;
                 <input type="checkbox" id="track">
                 <label for="track" class="checkbox-label">Track Number</label>
                 <span class="checkbox-custom circular"></span>
             </label>
         </div>
+        <div class="checkbox-container-mp3-flac circular-container">
+            <label class="checkbox-label">
+                <label for="MP3" class="checkbox-label">&nbsp;MP3/AIFF:</label>
+            </label>
+        </div>
+        <div style="clear:both;"></div>
+        <div class="checkbox-container-edit circular-container" style="display: none;">
+            <label class="checkbox-label">
+                <label for="MP3" class="checkbox-label">&nbsp;</label>
+            </label>
+        </div>
+        <div class="checkbox-container-mp3-flac circular-container">
+            <label class="checkbox-label">
+                <label for="FLAC" class="checkbox-label">&nbsp;FLAC:</label>
+            </label>
+        </div>
+        <div class="box">
+            <select id='id3Select'>
+                <option>No Style/Genre</option>
+                <option>Only Style</option>
+                <option>Only Genre</option>
+                <option>Merge Genre + Style</option>                     
+            </select>
+        </div>
+        <div class="box-flac">
+            <select id='flacSelect'>
+                <option>No Style/Genre</option>
+                <option>Both</option>
+                <option>Only Style (in Genre tag)</option>                     
+                <option>Only Genre</option>
+                <option>Merge Genre + Style</option>                     
+            </select>
+        </div>
+        <div style="clear:both;"></div>             
     </div>
-    <button class='button-start' onclick='start()' style="line-height: 20px; font-family: 'Roboto', sans-serif; font-weight: 400;" id='startButton'>START</button>
+    <button class='button-start' onclick='start()' style="line-height: 18px; font-family: 'Roboto', sans-serif; font-weight: 400;" id='startButton'>START</button>
     <br>
     <div class='bottom-bar'>
         <progress id='progress' class='progress' value='0' max='100'></progress>
@@ -111,8 +145,54 @@
             <span style="font-family: 'Roboto', sans-serif; font-weight: 400; font-size: 13; color: #A2A2A2;">PROGRESS: <span id="percent">0</span>%&nbsp; &nbsp; SUCCESSFUL: <span id="success">0</span>&nbsp; &nbsp; FAILED: <span id="fail">0</span></span>
         </div>
     </div>
+    <!-- The Modal -->
+    <div id="helpModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Help</h2>
+            </div>
+            <div class="modal-body">
+                <br>
+                <p>Easy Rust app to automatically update your audio tags & cover with data from Discogs</p> 
+                <p><b>How to use?</b></p>
+                1. Create account on 
+                <a onclick="url('https://www.discogs.com/users/create')">Discogs.com</a>
+                <br>
+                2. Go to 
+                <a onclick="url('https://www.discogs.com/settings/developers')">developers section</a> and click ‘Generate token’; copy the current token.
+                <br>
+                3. Select music folder, paste token, check tags you want to overwrite and press start!
+                <br>
+                <br>
+                <p><b>How does it work?</b></p>
+                It reads the artist + title tag from your local MP3, AIFF and FLAC files, feeds it into Discogs API search engine & writes the data.
+                <br>
+                <br>
+                <p><b>Results?</b></p>
+                Comparison of strictness filter settings and its results more in-depth 
+                <a onclick="url('https://docs.google.com/spreadsheets/d/1s13-tgcEAF1sete1nBYj9S9eDY1BiZqhcXWevt47s4w/edit?usp=sharing')">here</a>.
+                <br>
+                <br>
+                <p><b>Why does it take so long?</b></p>
+                Tagging might take a long time due to Discogs rate limiting. (~20 tracks / minute)
+                <br>
+                <br>
+                <p><b>Found a bug or have a request?</b></p>
+                Post it 
+                <a onclick="url('https://github.com/Marekkon5/discogstagger/issues')">here</a>!
+                <br>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <h5><a onclick="url('https://youtu.be/rl5y6NteWk4')">View Trailer</a></h5>
+            </div>
+        </div>
+    </div>
 </body>
 <script>
+
     var ws;
 
     function initSocket() {
@@ -159,6 +239,11 @@
         ws.send(JSON.stringify(data));
     }
 
+    //Open url in external browser
+    function url(u) {
+        emit('url', {'url': u});
+    }
+    
     function start() {
         if (!document.getElementById("token").value || document.getElementById("token").value.length < 6) {
             alert('Enter valid token!');
@@ -167,11 +252,11 @@
 
         emit('start', {'config': getConfig()});
     }
-
+    
     function browse() {
         emit('browse');
     }
-
+    
     function getConfig() {
         return {
             "path": document.getElementById("path").value,
@@ -179,20 +264,24 @@
             "album": document.getElementById("album").checked,
             "artist": document.getElementById("artist").checked,
             "track": document.getElementById("track").checked,
-            "genre": document.getElementById("genre").checked,
             "date": document.getElementById("date").checked,
             "label": document.getElementById("label").checked,
+            //Genres
+            "flacGenre": document.getElementById("flacSelect").selectedIndex,
+            "id3Genre": document.getElementById("id3Select").selectedIndex,
+
             "separator": document.getElementById("separator").value,
             "token": document.getElementById("token").value,
-            "styles": document.getElementById("styles").checked,
-            "art": document.getElementById("art").checked,
             "overwrite": document.getElementById("overwrite").checked,
+            "art": document.getElementById("art").checked,
+            "id3v23": document.getElementById("id3v23").checked,
             //Using toString so it is ALWAYS string
             "fuzziness": document.getElementById("fuzziness").value.toString(),
+
         }
     }
-
-
+    
+    
     function updateProgress(ok, fail, total) {
         var progress = document.getElementById("progress");
         if (total == 0) {
@@ -211,6 +300,28 @@
             alert('Done!');
         }
     }
+        
+    //Modal
+    var modal = document.getElementById("helpModal");
+    var btn = document.getElementById("help");
+    var span = document.getElementsByClassName("close")[0];
 
-</script>     
+    //When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    //When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    //When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+</script>
 </html>

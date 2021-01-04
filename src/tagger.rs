@@ -27,16 +27,29 @@ pub struct TaggerConfig {
     pub artist: bool,
     pub album: bool,
     pub label: bool,
-    pub genre: bool,
     pub date: bool,
     pub track: bool,
     pub art: bool,
 
+    //Genres
+    // 0 No Style/Genre
+    // 1 Only Style
+    // 2 Only Genre
+    // 3 Merge Genre + Style
+    pub id3_genre: i8,
+
+    // 0 No Style/Genre
+    // 1 Both
+    // 2 Only Style (in Genre tag)
+    // 3 Only Genre
+    // 4 Merge Genre + Style
+    pub flac_genre: i8,
+
     //Other
     pub artist_separator: String,
     pub fuzziness: u8,
-    pub use_styles: bool,
-    pub overwrite: bool
+    pub overwrite: bool,
+    pub id3v23: bool
 }
 
 pub fn match_track(discogs: &mut Discogs, info: &MusicFileInfo, fuzziness: u8) -> Result<Option<(Track, ReleaseMaster)>, Box<dyn std::error::Error>> {
@@ -103,7 +116,7 @@ fn clean_title(title: &str, matching: bool) -> String {
 
 pub fn get_files(path: &str) -> Vec<MusicFileInfo> {
     //Supported extensions
-    let supported_extensions = vec![".mp3", ".flac"];
+    let supported_extensions = vec![".mp3", ".flac", ".aif", ".aiff"];
     //List of filenames of supported formats for path
     WalkDir::new(path).into_iter().filter(
         |e| e.is_ok() && 
@@ -161,14 +174,28 @@ fn load_flac_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error
 
 //Wrapper to write tags by format
 pub fn write_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
+    //FLAC
     if path.to_ascii_lowercase().ends_with(".flac") {
         write_flac_tag(discogs, config, path, release, track)?;
         return Ok(())
     }
+    //ID3
+    let mut tag = match path.to_ascii_lowercase().ends_with(".mp3") {
+        true => Tag::read_from_path(path)?,
+        //AIFF
+        false => Tag::read_from_aiff(path)?
+    };
+    write_id3_tag(&mut tag, discogs, config, release, track)?;
+    let version = match config.id3v23 {
+        true => Version::Id3v23,
+        false => Version::Id3v24
+    };
+    //Save
+    match path.to_ascii_lowercase().ends_with(".mp3") {
+        true => tag.write_to_path(path, version)?,
+        false => tag.write_to_aiff(path, version)?
+    };
 
-    //ID3 = MP3
-    write_id3_tag(discogs, config, path, release, track)?;
-    
     Ok(())
 }
 
@@ -199,20 +226,33 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
             }
         }
     }
-    if config.genre {
+    if config.flac_genre > 0 {
         //Sort
         let mut genres = release.genres.clone();
         let mut styles = release.styles.clone();
         genres.sort();
         styles.sort();
         //Write
-        if config.overwrite || vorbis.get("GENRE").is_none() {
+        //Genre
+        if (config.flac_genre == 1 || config.flac_genre == 3) && (config.overwrite || vorbis.get("GENRE").is_none()) {
+            vorbis.set("GENRE", genres.clone());
+        }
+        //Styles in genre
+        if config.flac_genre == 2 && (config.overwrite || vorbis.get("GENRE").is_none()) {
+            vorbis.set("GENRE", styles.clone());
+        }
+        //Style
+        if config.flac_genre == 1 && (config.overwrite || vorbis.get("STYLE").is_none()) {
+            vorbis.set("STYLE", styles.clone());
+        }
+        //Both
+        if config.flac_genre == 4 && (config.overwrite || vorbis.get("GENRE").is_none()) {
+            genres.append(&mut styles);
+            genres.sort();
             vorbis.set("GENRE", genres);
         }
-        if config.overwrite || vorbis.get("STYLE").is_none() {
-            vorbis.set("STYLE", styles);
-        }
     }
+
     if config.track && (config.overwrite || vorbis.track().is_none()) {
         vorbis.set_track(track.position_int as u32);
     }
@@ -232,8 +272,7 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
     Ok(())
 }
 
-fn write_id3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
-    let mut tag = Tag::read_from_path(path)?;
+fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
     //Tags
     if config.title && config.overwrite {
         tag.set_title(&track.title);
@@ -271,15 +310,28 @@ fn write_id3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, relea
             second: None
         })
     }
-    if config.genre && (config.overwrite || tag.genre().is_none()) {
-        if config.use_styles {
-            let mut styles = release.styles.clone();
-            styles.sort();
-            tag.set_genre(styles.join(", "));
-        } else {
-            let mut genres = release.genres.clone();
-            genres.sort();
-            tag.set_genre(genres.join(", "));
+    if config.id3_genre > 0 && (config.overwrite || tag.genre().is_none()) {
+        match config.id3_genre {
+            //Only style
+            1 => {
+                let mut styles = release.styles.clone();
+                styles.sort();
+                tag.set_genre(styles.join(", "));
+            },
+            //Only genre
+            2 => {
+                let mut genres = release.genres.clone();
+                genres.sort();
+                tag.set_genre(genres.join(", "));
+            },
+            //Merge 
+            3 => {
+                let mut styles = release.styles.clone();
+                styles.append(&mut release.genres.clone());
+                styles.sort();
+                tag.set_genre(styles.join(", "));
+            },
+            _ => {}
         }
     }
     if config.track && (config.overwrite || tag.track().is_none()) {
@@ -301,8 +353,6 @@ fn write_id3_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, relea
         }
     }
 
-    //Save
-    tag.write_to_path(path, Version::Id3v24)?;
     Ok(())
 }
 

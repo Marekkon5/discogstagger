@@ -12,6 +12,7 @@ use crossterm::execute;
 use crossterm::style::{Color, Print, ResetColor, SetForegroundColor, SetAttribute, Attribute};
 use std::time::{SystemTime, Duration};
 use std::fs::File;
+use webbrowser;
 
 use crate::tagger;
 use crate::discogs::Discogs;
@@ -27,9 +28,9 @@ pub fn start_ui() {
         .content(web_view::Content::Html(content))
         .user_data(())
         .title("Discogs Tagger")
-        .size(400, 806)
+        .size(400, 700)
         .resizable(false)
-        .debug(false)
+        .debug(true)
         .build()
         .unwrap();
 
@@ -77,6 +78,10 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
                 websocket.write_message(Message::from(format!(r#"{{"path": "{}", "action": "path"}}"#, path.unwrap().replace("\\", "\\\\")))).ok();
             }
         },
+        //Open external url in browser
+        "url" => {
+            webbrowser::open(json["url"].as_str().unwrap()).ok();
+        },
         "start" => {
             println!("Starting...\n");
             
@@ -90,16 +95,17 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
             let config = tagger::TaggerConfig {
                 title: config_data["title"].as_bool().unwrap(),
                 artist: config_data["artist"].as_bool().unwrap(),
-                genre: config_data["genre"].as_bool().unwrap(),
                 track: config_data["track"].as_bool().unwrap(),
                 album: config_data["album"].as_bool().unwrap(),
                 date: config_data["date"].as_bool().unwrap(),
                 label: config_data["label"].as_bool().unwrap(),
                 artist_separator: String::from(config_data["separator"].as_str().unwrap()),
                 fuzziness: config_data["fuzziness"].as_str().unwrap_or("80").parse().unwrap_or(80) as u8,
-                use_styles: config_data["styles"].as_bool().unwrap(),
                 art: config_data["art"].as_bool().unwrap(),
-                overwrite: config_data["overwrite"].as_bool().unwrap()
+                overwrite: config_data["overwrite"].as_bool().unwrap(),
+                id3v23: config_data["id3v23"].as_bool().unwrap(),
+                id3_genre: config_data["id3Genre"].as_i64().unwrap() as i8,
+                flac_genre: config_data["flacGenre"].as_i64().unwrap() as i8,
             };
             //Create discogs
             match Discogs::new() {

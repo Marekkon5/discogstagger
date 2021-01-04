@@ -1,6 +1,4 @@
-# Discogs Tagger
-
-![Logo](https://raw.githubusercontent.com/Marekkon5/discogstagger/main/src/assets/icon48.png) 
+# ![Logo](https://raw.githubusercontent.com/Marekkon5/discogstagger/main/src/assets/32x32.png) Discogs Tagger
 
 Simple Rust + Webview app to automatically tag your music collection using data from Discogs.
 

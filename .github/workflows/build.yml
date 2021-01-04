@@ -74,15 +74,15 @@ jobs:
     - name: Compress
       run: |
         brew install upx
-        strip target/release/discogstaggerrs
-        upx -9 target/release/discogstaggerrs
+        strip target/release/bundle/osx/DiscogsTagger.app/Contents/MacOS/discogstaggerrs
+        upx -9 target/release/bundle/osx/DiscogsTagger.app/Contents/MacOS/discogstaggerrs
 
     # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: discogstagger-mac
-        path: target/release/discogstaggerrs
+        path: target/release/bundle/osx/DiscogsTagger.app
 
   build-win:
     name: Windows
