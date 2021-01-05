@@ -41,17 +41,3 @@ winres = "0.1"
 opt-level = 'z'
 lto = true
 # panic = 'abort'
-
-# Bundling, only used for Mac, not tested/used for Linux/Win
-[package.metadata.bundle]
-name = "DiscogsTagger"
-identifier = "com.marekkon5.discogstagger"
-icon = ["src/assets/32x32.png", "src/assets/128x128.png", "src/assets/128x128@2x.png", "src/assets/icon.icns", "src/assets/icon.ico"]
-version = "0.1.2"
-resources = []
-copyright = "Copyright (c) Marekkon5 2020. All rights reserved."
-category = "Music"
-short_description = "Tool to tag your audio library using data from Discogs."
-long_description = """
-Simple Rust + Webview app to automatically tag your music collection using data from Discogs.
-"""

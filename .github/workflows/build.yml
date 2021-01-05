@@ -69,31 +69,28 @@ jobs:
       with:
         command: install
         args: cargo-bundle
-    
+
     # Cargo build release
     - name: Compile
       uses: actions-rs/cargo@v1
       with:
-        command: bundle
+        command: build
         args: --release
     
     # Strip and compress with UPX
     - name: Compress
       run: |
         brew install upx
-        cd target/release/bundle/osx
-        strip DiscogsTagger.app/Contents/MacOS/discogstaggerrs
-        upx -9 DiscogsTagger.app/Contents/MacOS/discogstaggerrs
-        chmod +x DiscogsTagger.app/Contents/MacOS/discogstaggerrs
-        zip -r DiscogsTagger.zip .
-        cd -
-
+        strip target/release/discogstaggerrs
+        upx -9 target/release/discogstaggerrs
+        
     # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: discogstagger-mac
-        path: target/release/bundle/osx/DiscogsTagger.zip
+        path: target/release/discogstaggerrs
+
 
   build-win:
     name: Windows
