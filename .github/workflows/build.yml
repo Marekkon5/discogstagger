@@ -81,15 +81,19 @@ jobs:
     - name: Compress
       run: |
         brew install upx
-        strip target/release/bundle/osx/DiscogsTagger.app/Contents/MacOS/discogstaggerrs
-        upx -9 target/release/bundle/osx/DiscogsTagger.app/Contents/MacOS/discogstaggerrs
+        cd target/release/bundle/osx
+        strip DiscogsTagger.app/Contents/MacOS/discogstaggerrs
+        upx -9 DiscogsTagger.app/Contents/MacOS/discogstaggerrs
+        chmod +x DiscogsTagger.app/Contents/MacOS/discogstaggerrs
+        zip -r DiscogsTagger.zip .
+        cd -
 
     # Upload
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: discogstagger-mac
-        path: target/release/bundle/osx
+        path: target/release/bundle/osx/DiscogsTagger.zip
 
   build-win:
     name: Windows
