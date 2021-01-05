@@ -455,12 +455,12 @@ h2 {
 }
 
 .progress::-webkit-progress-value {
-    background-color: #82bc00;
+    background-color: #0da3c6;
     border-radius: 2px;
 }
 
 .progress::-moz-progress-bar {
-    background-color: #82bc00;
+    background-color: #0da3c6;
     border-radius: 2px;
 }
 
