@@ -62,12 +62,19 @@ jobs:
         profile: minimal
         toolchain: stable
         override: true
+
+    # Install cargo bundler
+    - name: Install cargo-bundle
+      uses: actions-rs/cargo@v1
+      with:
+        command: install
+        args: cargo-bundle
     
     # Cargo build release
     - name: Compile
       uses: actions-rs/cargo@v1
       with:
-        command: build
+        command: bundle
         args: --release
     
     # Strip and compress with UPX
