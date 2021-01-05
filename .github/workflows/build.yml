@@ -89,7 +89,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: discogstagger-mac
-        path: target/release/bundle/osx/DiscogsTagger.app
+        path: target/release/bundle/osx
 
   build-win:
     name: Windows
