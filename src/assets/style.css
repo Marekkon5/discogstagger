@@ -833,3 +833,7 @@ a:hover {
 select::-ms-expand {
     display: none;
 }
+
+.link {
+    cursor: pointer;
+}
