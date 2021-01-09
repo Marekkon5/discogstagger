@@ -42,17 +42,12 @@ Simple Rust + Webview app to automatically tag your music collection using data 
 
 # Troubleshooting
 
-## MacOS:
+### MacOS:
 If you get a warning on macOS, this app can't be opened for whatever reason:  
 - Click Apple icon on top left
 - Click System Preferences
 - Click Security & Privacy
 - Click Open Anyway
-
-## Windows:
-If you get an error opening the app like: "(Exception from HRESULT: 0x80010007 (RPC_E_SERVER_DIED))"  
-- Try to run it without Admin rights.
-- In order to do so, make sure <a href="https://articulate.com/support/article/how-to-turn-user-account-control-on-or-off-in-windows-10">UAC</a> is enabled.
 
 # How to use
 
