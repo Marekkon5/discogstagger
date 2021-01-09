@@ -287,7 +287,7 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
     if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || tag.get("TPUB").is_none()) {
         tag.set_text("TPUB", release.label.as_ref().unwrap().first().unwrap());
     }
-    if config.date && release.year.is_some() && (config.overwrite || tag.date_released().is_none()) {
+    if config.date && release.year.is_some() && (config.overwrite || tag.date_recorded().is_none()) {
         //Parse date
         let mut month = None;
         let mut day = None;
@@ -301,7 +301,7 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
             }
         }
 
-        tag.set_date_released(Timestamp {
+        tag.set_date_recorded(Timestamp {
             year: release.year.unwrap() as i32,
             month: month,
             day: day,
