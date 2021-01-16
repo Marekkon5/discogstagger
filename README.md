@@ -2,7 +2,7 @@
 
 Simple Rust + Webview app to automatically tag your music collection using data from Discogs.
 
-![Screenshot](https://raw.githubusercontent.com/Marekkon5/discogstagger/main/src/assets/screenshot.png)
+![Screenshot](https://i.imgur.com/lG08mHc.png)
 
 # Compatibility
 <table>
@@ -43,7 +43,7 @@ Simple Rust + Webview app to automatically tag your music collection using data 
 # Troubleshooting
 
 ### MacOS:
-If you get a warning on macOS, this app can't be opened for whatever reason:  
+If you get a warning on MacOS, this app can't be opened for whatever reason:  
 - Click Apple icon on top left
 - Click System Preferences
 - Click Security & Privacy

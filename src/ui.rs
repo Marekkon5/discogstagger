@@ -28,7 +28,7 @@ pub fn start_ui() {
         .content(web_view::Content::Html(content))
         .user_data(())
         .title("Discogs Tagger")
-        .size(400, 700)
+        .size(385, 700)
         .resizable(false)
         .debug(false)
         .build()

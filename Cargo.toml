@@ -1,6 +1,6 @@
 [package]
 name = "discogstaggerrs"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Marekkon5"]
 license = "MIT"
 description = "Tool to tag your audio library using data from Discogs"

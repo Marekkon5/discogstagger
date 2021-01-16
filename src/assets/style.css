@@ -12,16 +12,16 @@ body {
 
 h1 {
     text-align: left;
-    margin-top: -2px;
+    margin-top: 0px;
     margin-bottom: 5%;
     background-color: #2a2a2a;
     padding-left: 65px;
     padding-bottom: 30px;
-    padding-top: 30px;
+    padding-top: 32px;
     background-image: url('favicon-xsmall.png');
     background-repeat: no-repeat;
     background-position: 28px;
-    background-size: 177px;
+    background-size: auto;
     color: #ffffff;
     box-sizing: border-box;
     border-top-width: 0x;
@@ -60,7 +60,7 @@ h2 {
     border: 0px solid #efefef;
     border-radius: .3rem;
     background-color: #2a2a2a;
-    margin-top: 7px;
+    margin-top: 12px;
     margin-bottom: 0px;
     width: 270px;
     height: 30px;
@@ -159,7 +159,7 @@ h2 {
     margin: 0;
     padding-left: 8%;
     height: 510px;
-    margin-top: -16px;
+    margin-top: -20px;
 
     /* background-color: #404040 */
 }
@@ -199,9 +199,10 @@ h2 {
     text-transform: uppercase;
     font-size: 13;
     text-indent: 11PX;
-    margin-bottom: 7px;
+    margin-bottom: 12px;
+    float: none;
     padding-top: 0px;
-    padding-bottom: 2;
+    box-sizing: border-box;
 }
 
 .text-input input:focus {
@@ -217,10 +218,10 @@ h2 {
 
 .text-input input {
     width: 75px;
-    height: 24px;
+    height: 20px;
     background-color: #2a2a2a;
     position: absolute;
-    margin-top: -4px;
+    margin-top: 0px;
     border: 1px solid #333333;
     border-radius: 0px;
     color: #16AADF;
@@ -229,6 +230,7 @@ h2 {
     left: 281px;
     font-weight: 700;
     text-indent: 3%;
+    box-sizing: border-box;
 }
 
 .text-input-edit {
@@ -239,9 +241,10 @@ h2 {
     text-transform: uppercase;
     font-size: 13;
     text-indent: 11PX;
-    margin-bottom: 7px;
+    margin-bottom: 12px;
+    float: none;
     padding-top: 0px;
-    padding-bottom: 2;
+    box-sizing: border-box;
 }
 
 .text-input-edit input:focus {
@@ -550,24 +553,24 @@ input:checked + .slider:before {
 .toggle {
     left: 282px;
     position: absolute;
-    top: 316px;
+    top: 325px;
     width: 100px;
 }
 
 .id3 {
-    left: 318px;
+    left: 240px;
     position: absolute;
-    top: 317px;
-    width: 100px;
+    top: 326px;
+    width: 200px;
     font-size: 10;
     color: white;
     font-family: 'Roboto', sans-serif;
 }
 
 .help {
-    left: 294px;
+    left: 292px;
     position: absolute;
-    top: 27px;
+    top: 31px;
     width: 100px;
 }
 
@@ -701,7 +704,7 @@ a:hover {
 
 .box {
     position: absolute;
-    top: 495px;
+    top: 505px;
     left: 242px;
     transform: translate(-50%, -50%);
     border-radius: 5px;
@@ -758,7 +761,7 @@ a:hover {
 
 .box-flac {
     position: absolute;
-    top: 540px;
+    top: 550px;
     left: 242px;
     transform: translate(-50%, -50%);
     border-radius: 5px;

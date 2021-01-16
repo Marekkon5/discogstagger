@@ -287,7 +287,7 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
     if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || tag.get("TPUB").is_none()) {
         tag.set_text("TPUB", release.label.as_ref().unwrap().first().unwrap());
     }
-    if config.date && release.year.is_some() && (config.overwrite || tag.date_recorded().is_none()) {
+    if config.date && release.year.is_some() {
         //Parse date
         let mut month = None;
         let mut day = None;
@@ -300,15 +300,36 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
                 Err(_) => {}
             }
         }
+        //ID3v2.4
+        if !config.id3v23 && (config.overwrite || tag.date_recorded().is_none()) {
+            //Remove ID3v2.3
+            tag.remove("TDAT");
+            tag.remove("TYER");
 
-        tag.set_date_recorded(Timestamp {
-            year: release.year.unwrap() as i32,
-            month: month,
-            day: day,
-            hour: None,
-            minute: None,
-            second: None
-        })
+            tag.set_date_recorded(Timestamp {
+                year: release.year.unwrap() as i32,
+                month: month,
+                day: day,
+                hour: None,
+                minute: None,
+                second: None
+            });
+        }
+
+        //ID3v2.3
+        if config.id3v23 {
+            //Date
+            if (config.overwrite || tag.get("TDAT").is_none()) && (month.is_some() && day.is_some()) {
+                tag.remove_date_recorded();
+                tag.set_text("TDAT", &format!("{:02}{:02}", day.unwrap(), month.unwrap()));
+            }
+            //Year
+            if config.overwrite || tag.get("TYER").is_none() {
+                tag.remove_date_recorded();
+                tag.set_text("TYER", release.year.unwrap().to_string());
+            }
+        }
+
     }
     if config.id3_genre > 0 && (config.overwrite || tag.genre().is_none()) {
         match config.id3_genre {

@@ -41,14 +41,14 @@
         </div>
         <div class="text-input" style="font-family: 'Roboto', sans-serif;">
             <label for="separator">Artist Separator:</label>
-            <input type="text" id="separator" value="; ">
+            <input type="text" id="separator" value="; " style="margin-top: -4px;">
         </div>
         <div class="text-input" style="margin-top: -1px; font-family: 'Roboto', sans-serif;">
             <label for="fuzziness">Strictness (%):</label>
-            <input type="number" id="fuzziness" value="80" min="10" max="100" step="1" style="margin-top: -2px;">
+            <input type="number" id="fuzziness" value="80" min="10" max="100" step="1" style="margin-top: -6px;">
         </div>
         <div>
-            <div class="id3">ID3v2.3</div>
+            <div class="id3">ID3v2.4 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp;&nbsp;   ID3v2.3</div>
             <div class="toggle">
                 <!-- Rounded switch -->
                 <label class="switch">
@@ -267,8 +267,8 @@
             "date": document.getElementById("date").checked,
             "label": document.getElementById("label").checked,
             //Genres
-            "flacGenre": document.getElementById("flacSelect").selectedIndex,
-            "id3Genre": document.getElementById("id3Select").selectedIndex,
+            "flacGenre": document.getElementById("flacSelect").selectedIndex || 0,
+            "id3Genre": document.getElementById("id3Select").selectedIndex || 0,
 
             "separator": document.getElementById("separator").value,
             "token": document.getElementById("token").value,

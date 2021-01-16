@@ -77,12 +77,10 @@ jobs:
         command: build
         args: --release
     
-    # Strip and compress with UPX
+    # Strip, don't compress because UPX on Big Sur doesn't work properly
     - name: Compress
       run: |
-        brew install upx
         strip target/release/discogstaggerrs
-        upx -9 target/release/discogstaggerrs
         
     # Upload
     - name: Upload
