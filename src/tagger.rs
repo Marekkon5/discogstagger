@@ -215,7 +215,7 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
             .into_iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>());
     }
     if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || vorbis.get("LABEL").is_none()) {
-        vorbis.set("LABEL", vec![release.label.as_ref().unwrap().first().unwrap()]);
+        vorbis.set("LABEL", vec![clean_discogs_artist(release.label.as_ref().unwrap().first().unwrap())]);
     }
     if config.date && (config.overwrite || vorbis.get("DATE").is_none()) {
         if release.released.is_some() {
@@ -285,7 +285,7 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
             .into_iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>().join(&config.artist_separator));
     }
     if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || tag.get("TPUB").is_none()) {
-        tag.set_text("TPUB", release.label.as_ref().unwrap().first().unwrap());
+        tag.set_text("TPUB", clean_discogs_artist(release.label.as_ref().unwrap().first().unwrap()));
     }
     if config.date && release.year.is_some() {
         //Parse date
@@ -378,7 +378,7 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
 }
 
 fn clean_discogs_artist(name: &str) -> String {
-    let re = Regex::new(r"\(\d{1,2}\)$").unwrap();
+    let re = Regex::new(r" \(\d{1,2}\)$").unwrap();
     re.replace(name, "").to_string()
 }
 

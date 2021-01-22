@@ -2,7 +2,7 @@
 
 Simple Rust + Webview app to automatically tag your music collection using data from Discogs.
 
-![Screenshot](https://i.imgur.com/lG08mHc.png)
+![Screenshot](https://i.imgur.com/uCVeoUu.png)
 
 # Compatibility
 <table>
@@ -31,7 +31,7 @@ Simple Rust + Webview app to automatically tag your music collection using data 
         </tr>
         <tr>
             <td>macOS Big Sur</td>
-            <td>❌</td>
+            <td>✅</td>
         </tr>
         <tr>
             <td>Linux</td>
