@@ -3,10 +3,11 @@
     <link rel='icon' type='image/png' href='/favicon.png'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <meta charset="utf-8"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet"/>
     <link href='style.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/> 
 </head>
 <body>
     <h1></h1>
@@ -35,20 +36,21 @@
             </label>
         </div>
         <div style="clear:both;"></div>
-        <div class="text-input-edit" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
+        <div class="text-input-token" style="padding-top: 2px; font-family: 'Roboto', sans-serif;">
             <label for="token">Token:</label>
             <input type="text" id="token" value="###TOKEN###">
         </div>
-        <div class="text-input" style="font-family: 'Roboto', sans-serif;">
+        <div class="text-input-separator">
             <label for="separator">Artist Separator:</label>
-            <input type="text" id="separator" value="; " style="margin-top: -4px;">
+            <input type="text" id="separator" value="; " style="margin-top: -6px;">
         </div>
-        <div class="text-input" style="margin-top: -1px; font-family: 'Roboto', sans-serif;">
+        <div class="text-input-strict" style="margin-top: 0px;">
             <label for="fuzziness">Strictness (%):</label>
-            <input type="number" id="fuzziness" value="80" min="10" max="100" step="1" style="margin-top: -6px;">
+            <input type="number" id="fuzziness" value="80" min="10" max="100" step="1" style="margin-top: -8px;">
         </div>
         <div>
-            <div class="id3">ID3v2.4 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp;&nbsp;   ID3v2.3</div>
+            <div class="id3v24">ID3v2.4</div>
+            <div class="id3v23">ID3v2.3</div>
             <div class="toggle">
                 <!-- Rounded switch -->
                 <label class="switch">
@@ -116,7 +118,7 @@
                 <label for="FLAC" class="checkbox-label">&nbsp;FLAC:</label>
             </label>
         </div>
-        <div class="box">
+        <div class="box-mp3">
             <select id='id3Select'>
                 <option>No Style/Genre</option>
                 <option>Only Style</option>

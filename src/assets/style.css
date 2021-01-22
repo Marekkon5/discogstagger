@@ -12,18 +12,15 @@ body {
 
 h1 {
     text-align: left;
-    margin-top: 0px;
-    margin-bottom: 5%;
     background-color: #2a2a2a;
     padding-left: 65px;
     padding-bottom: 30px;
-    padding-top: 32px;
+    padding-top: 30px;
     background-image: url('favicon-xsmall.png');
     background-repeat: no-repeat;
     background-position: 28px;
     background-size: auto;
     color: #ffffff;
-    box-sizing: border-box;
     border-top-width: 0x;
     border-left-width: 0x;
     border-right-width: 0x;
@@ -31,6 +28,7 @@ h1 {
     border-left-style: none;
     border-right-style: none;
     border-bottom: 1px ridge #444;
+    margin: 0;
 }
 
 h3 {
@@ -60,7 +58,7 @@ h2 {
     border: 0px solid #efefef;
     border-radius: .3rem;
     background-color: #2a2a2a;
-    margin-top: 12px;
+    margin-top: 11px;
     margin-bottom: 0px;
     width: 270px;
     height: 30px;
@@ -158,8 +156,8 @@ h2 {
     font-weight: 400;
     margin: 0;
     padding-left: 8%;
-    height: 510px;
-    margin-top: -20px;
+    height: 500px;
+    margin-top: 0px;
 
     /* background-color: #404040 */
 }
@@ -177,7 +175,7 @@ h2 {
     margin-left: 2%;
     font-family: 'Roboto', sans-serif;
     font-size: 14;
-    font-weight: 700;
+    font-weight: 400;
 }
 
 .path-input:focus {
@@ -191,9 +189,9 @@ h2 {
     -o-transition: all 0.3s ease-out;
 }
 
-.text-input {
+.text-input-separator {
     margin-top: 0px;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-weight: 400;
     color: #A2A2A2;
     text-transform: uppercase;
@@ -201,11 +199,11 @@ h2 {
     text-indent: 11PX;
     margin-bottom: 12px;
     float: none;
-    padding-top: 0px;
+    padding-top: 5px;
     box-sizing: border-box;
 }
 
-.text-input input:focus {
+.text-input-separator input:focus {
     border-color: white;
     border-radius: 0;
     border-width: 1;
@@ -216,9 +214,9 @@ h2 {
     -o-transition: all 0.3s ease-out;
 }
 
-.text-input input {
+.text-input-separator input {
     width: 75px;
-    height: 20px;
+    height: 24px;
     background-color: #2a2a2a;
     position: absolute;
     margin-top: 0px;
@@ -228,12 +226,12 @@ h2 {
     font-family: 'Roboto', sans-serif;
     font-size: 14;
     left: 281px;
-    font-weight: 700;
+    font-weight: 400;
     text-indent: 3%;
     box-sizing: border-box;
 }
 
-.text-input-edit {
+.text-input-token {
     margin-top: 0px;
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
@@ -247,7 +245,7 @@ h2 {
     box-sizing: border-box;
 }
 
-.text-input-edit input:focus {
+.text-input-token input:focus {
     border-color: white;
     border-radius: 0;
     border-width: 1;
@@ -258,7 +256,7 @@ h2 {
     -o-transition: all 0.3s ease-out;
 }
 
-.text-input-edit input {
+.text-input-token input {
     width: 260px;
     height: 24px;
     background-color: #2a2a2a;
@@ -270,8 +268,50 @@ h2 {
     font-family: 'Roboto', sans-serif;
     font-size: 11;
     left: 96px;
-    font-weight: 700;
+    font-weight: 400;
     text-indent: 3%;
+}
+
+.text-input-strict {
+    margin-top: 0px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    color: #A2A2A2;
+    text-transform: uppercase;
+    font-size: 13;
+    text-indent: 11PX;
+    margin-bottom: 12px;
+    float: none;
+    padding-top: 5px;
+    box-sizing: border-box;
+}
+
+.text-input-strict input:focus {
+    border-color: white;
+    border-radius: 0;
+    border-width: 1;
+    transition: all 0.3s ease-out;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+}
+
+.text-input-strict input {
+    width: 75px;
+    height: 24px;
+    background-color: #2a2a2a;
+    position: absolute;
+    margin-top: 0px;
+    border: 1px solid #333333;
+    border-radius: 0px;
+    color: #16AADF;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14;
+    left: 281px;
+    font-weight: 400;
+    text-indent: 3%;
+    box-sizing: border-box;
 }
 
 .settings-container {
@@ -299,6 +339,7 @@ h2 {
     padding-top: 2px;
     box-sizing: border-box;
     display: inline;
+    padding-left: 2px;
 }
 
 .checkbox-label input {
@@ -553,25 +594,36 @@ input:checked + .slider:before {
 .toggle {
     left: 282px;
     position: absolute;
-    top: 325px;
-    width: 100px;
+    top: 329px;
+    width: 35px;
 }
 
-.id3 {
+.id3v24 {
     left: 240px;
     position: absolute;
-    top: 326px;
-    width: 200px;
+    top: 331px;
+    width: 40px;
+    font-size: 10;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+}
+
+.id3v23 {
+    left: 318px;
+    position: absolute;
+    top: 331px;
+    width: 40px;
     font-size: 10;
     color: white;
     font-family: 'Roboto', sans-serif;
 }
 
 .help {
-    left: 292px;
+    left: 329px;
     position: absolute;
     top: 31px;
-    width: 100px;
+    width: 25px;
+    -webkit-appearance: none;
 }
 
 a {
@@ -702,11 +754,10 @@ a:hover {
     font-family: 'Roboto', sans-serif;
 }
 
-.box {
+.box-mp3 {
     position: absolute;
-    top: 505px;
-    left: 242px;
-    transform: translate(-50%, -50%);
+    top: 496px;
+    left: 135px;
     border-radius: 5px;
     transition: all 0.3s ease-out;
     -webkit-transition: all 0.3s ease-out;
@@ -718,13 +769,13 @@ a:hover {
     cursor: pointer;
 }
 
-.box select {
+.box-mp3 select {
     background-color: #333333;
     color: white;
     padding-left: 8px;
     padding-top: 1px;
     padding-bottom: 1px;
-    width: 205px;
+    width: 195px;
     border: none;
     font-size: 14px;
     -webkit-appearance: button;
@@ -733,7 +784,7 @@ a:hover {
     cursor: pointer;
 }
 
-.box::before {
+.box-mp3::before {
     content: "\f078";
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
@@ -749,21 +800,20 @@ a:hover {
     pointer-events: none;
 }
 
-.box:hover::before {
+.box-mp3:hover::before {
     color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
 }
 
-.box select option {
+.box-mp3 select option {
     padding: 30px;
     cursor: pointer;
 }
 
 .box-flac {
     position: absolute;
-    top: 550px;
-    left: 242px;
-    transform: translate(-50%, -50%);
+    top: 541px;
+    left: 135px;
     border-radius: 5px;
     transition: all 0.3s ease-out;
     -webkit-transition: all 0.3s ease-out;
@@ -773,6 +823,7 @@ a:hover {
     border: 2px solid #808080;
     box-sizing: border-box;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .box-flac select {
@@ -781,7 +832,7 @@ a:hover {
     padding-left: 8px;
     padding-top: 1px;
     padding-bottom: 1px;
-    width: 205px;
+    width: 195px;
     border: none;
     font-size: 14px;
     -webkit-appearance: button;

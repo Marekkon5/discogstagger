@@ -37,7 +37,7 @@ jobs:
       with:
         infile: 'target/release/discogstaggerrs'
         strip_args: '--strip-all'
-        upx_args: '-9'
+        upx_args: '-9 --lzma'
     
     # Upload
     - name: Upload
@@ -118,7 +118,7 @@ jobs:
     - name: Compress
       run: |
         choco install upx
-        upx -9 target\release\discogstaggerrs.exe
+        upx -9 --lzma target\release\discogstaggerrs.exe
     
     # Upload
     - name: Upload
