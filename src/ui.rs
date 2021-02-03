@@ -12,14 +12,13 @@ use crossterm::execute;
 use crossterm::style::{Color, Print, ResetColor, SetForegroundColor, SetAttribute, Attribute};
 use std::time::{SystemTime, Duration};
 use std::fs::File;
-use webbrowser;
 
 use crate::tagger;
 use crate::discogs::Discogs;
 
 pub fn start_ui() {
     //Check if token is saved
-    let token = std::fs::read_to_string(".discogstoken").unwrap_or(String::new());
+    let token = std::fs::read_to_string(".discogstoken").unwrap_or_else(|_| String::new());
 
     let content = include_str!("assets/dist.html").replace("###TOKEN###", &token);
 
@@ -193,6 +192,19 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
     };
 
     Ok(())
+}
+
+//Pretty print that track has invalid meta
+pub fn print_invalid_track(path: &str) {
+    execute!(
+        stdout(),
+        SetAttribute(Attribute::Bold),
+        SetForegroundColor(Color::Yellow),
+        Print("WARNING: "),
+        ResetColor,
+        SetAttribute(Attribute::Reset),
+        Print(format!("Failed loading track: {}\n", path))
+    ).ok();
 }
 
 //Pretty print done messange

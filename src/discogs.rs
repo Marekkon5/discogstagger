@@ -161,8 +161,8 @@ impl SearchResults {
         };
 
         Some(SearchResults {
-            releases: releases,
-            masters: masters
+            releases,
+            masters
         })
     }
 }
@@ -200,7 +200,7 @@ pub struct ReleaseMaster {
 impl ReleaseMaster {
     pub fn from_json(json: Value, rtype: ReleaseType, label: Option<Vec<String>>) -> Option<ReleaseMaster> {
         Some(ReleaseMaster {
-            rtype: rtype,
+            rtype,
             title: json["title"].as_str()?.to_owned(),
             id: json["id"].as_i64()?,
             //styles, genres, labels are singular in search results json

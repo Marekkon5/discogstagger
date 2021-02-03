@@ -27,7 +27,7 @@ web-view = "0.7.2"
 webbrowser = "0.5.5"
 
 # AIFF Support, waiting for merge
-id3 = { git = "https://github.com/Marekkon5/rust-id3" }
+id3 = { git = "https://github.com/Marekkon5/rust-id3", branch = "master" }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"

@@ -12,6 +12,7 @@ use id3::frame::PictureType as ID3PictureType;
 use id3::frame::Picture;
 
 use crate::discogs::{Discogs, Track, ReleaseMaster, ReleaseType};
+use crate::ui;
 
 #[derive(Debug, Clone)]
 pub struct MusicFileInfo {
@@ -56,7 +57,7 @@ pub fn match_track(discogs: &mut Discogs, info: &MusicFileInfo, fuzziness: u8) -
     //Search
     let mut results = discogs.search(Some("release,master"), Some(&format!("{} {}", clean_title(&info.title, false), &info.artists.first().unwrap())), None, None)?;
     //Fallback
-    if (&results).is_none() || &results.as_ref().unwrap().releases.len() == &0 {
+    if (&results).is_none() || results.as_ref().unwrap().releases.is_empty() {
         results = discogs.search(Some("release,master"), None, Some(&info.title), Some(info.artists.first().unwrap()))?;
     }
     //No results
@@ -124,9 +125,16 @@ pub fn get_files(path: &str) -> Vec<MusicFileInfo> {
     ).map(|e| e.unwrap().path().to_str().unwrap().to_owned())
     //Load info
     .filter_map(|f| {
+        //Debug
+        #[cfg(debug_assertions)]
+        println!("Loading track: {}", f);
+
         match load_file_info(&f) {
             Ok(i) => Some(i),
-            Err(_) => None
+            Err(_) => {
+                ui::print_invalid_track(&f);
+                None
+            }
         }
     }).collect()
 }
@@ -136,13 +144,16 @@ pub fn load_file_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::E
     if path.to_ascii_lowercase().ends_with(".flac") {
         return load_flac_info(path);
     }
-
-    return load_id3_info(path);   
+    load_id3_info(path)   
 }
 
 //Load ID3 metadata from MP3
 fn load_id3_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>> {
-    let tag = Tag::read_from_path(path)?;
+    let tag = if path.ends_with(".aif") || path.ends_with(".aiff") {
+        Tag::read_from_aiff(path)?
+    } else {
+        Tag::read_from_path(path)?
+    };
 
     Ok(MusicFileInfo {
         path: path.to_owned(),
@@ -168,7 +179,7 @@ fn load_flac_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error
     Ok(MusicFileInfo {
         path: path.to_owned(),
         title: vorbis.title().ok_or("Missing title!")?.first().ok_or("Missing title!")?.to_owned(),
-        artists: artists
+        artists
     })
 }
 
@@ -308,8 +319,8 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
 
             tag.set_date_recorded(Timestamp {
                 year: release.year.unwrap() as i32,
-                month: month,
-                day: day,
+                month,
+                day,
                 hour: None,
                 minute: None,
                 second: None
@@ -367,7 +378,7 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
                     mime_type: "image/jpeg".to_string(),
                     picture_type: ID3PictureType::CoverFront,
                     description: "Cover".to_string(),
-                    data: data
+                    data
                 });
             },
             Err(_) => eprintln!("Error downloading album art, ignoring!")
@@ -384,14 +395,14 @@ fn clean_discogs_artist(name: &str) -> String {
 
 //Try to split artist string with common separators
 fn parse_artist_tag(src: &str) -> Vec<String> {
-    if src.contains(";") {
-        return src.split(";").collect::<Vec<&str>>().into_iter().map(|v| v.to_owned()).collect();
+    if src.contains(';') {
+        return src.split(';').collect::<Vec<&str>>().into_iter().map(|v| v.to_owned()).collect();
     }
-    if src.contains(",") {
-        return src.split(",").collect::<Vec<&str>>().into_iter().map(|v| v.to_owned()).collect();
+    if src.contains(',') {
+        return src.split(',').collect::<Vec<&str>>().into_iter().map(|v| v.to_owned()).collect();
     }
-    if src.contains("/") {
-        return src.split("/").collect::<Vec<&str>>().into_iter().map(|v| v.to_owned()).collect();
+    if src.contains('/') {
+        return src.split('/').collect::<Vec<&str>>().into_iter().map(|v| v.to_owned()).collect();
     }
     vec![src.to_owned()]
 }
