@@ -12,6 +12,7 @@ use id3::frame::PictureType as ID3PictureType;
 use id3::frame::Picture;
 use std::fs::File;
 use std::io::prelude::*;
+use std::io::SeekFrom;
 
 use crate::discogs::{Discogs, Track, ReleaseMaster, ReleaseType};
 use crate::ui;
@@ -190,8 +191,9 @@ fn load_flac_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error
     if &header != b"fLaC" {
         return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Not a valid FLAC!").into());
     }
-
-    let tag = metaflac::Tag::read_from_path(path)?;
+    file.seek(SeekFrom::Start(0))?;
+    //Load tag
+    let tag = metaflac::Tag::read_from(&mut file)?;
     let vorbis = tag.vorbis_comments().ok_or("Missing Vorbis Comments!")?;
     //Parse artists
     let artists = match vorbis.artist().ok_or("Missing artists!")?.len() {
