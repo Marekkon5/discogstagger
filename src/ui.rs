@@ -129,19 +129,16 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
                         return Err(String::from("Invalid token!"));
                     }
                     //Save token
-                    match File::create(".discogstoken") {
-                        Ok(mut f) => {
-                            f.write_all((&discogs).token.as_ref().unwrap().as_bytes()).ok();
-                        },
-                        Err(_) => {}
-                    };
+                    if let Ok(mut f) = File::create(".discogstoken") {
+                        f.write_all(discogs.token.as_ref().unwrap().as_bytes()).ok();
+                    }
 
                     //Toggle button
                     websocket.write_message(Message::from(r#"{"action": "button"}"#)).ok();
 
                     let mut ok = 0;
                     let mut fail = 0;
-                    let ts_start = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or(Duration::from_millis(0)).as_secs();
+                    let ts_start = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_else(|_| Duration::from_millis(0)).as_secs();
 
                     //Load files
                     let files = tagger::get_files(path);
@@ -152,7 +149,7 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
                                 match o {
                                     Some((track, release)) => {
                                         //Write tag
-                                        match tagger::write_tag(&mut discogs, &config, &file.path, &release, &track) {
+                                        match tagger::write_tag(&mut discogs, &config, &file, &release, &track) {
                                             Ok(_) => {
                                                 ok += 1;
                                                 print_console(&file.path, Ok(()), ok, fail, total as i32);
@@ -194,8 +191,8 @@ fn process_message(text: &str, websocket: &mut tungstenite::WebSocket<std::net::
     Ok(())
 }
 
-//Pretty print that track has invalid meta
-pub fn print_invalid_track(path: &str) {
+//Print warning into console
+pub fn print_warning(text: &str) {
     execute!(
         stdout(),
         SetAttribute(Attribute::Bold),
@@ -203,7 +200,8 @@ pub fn print_invalid_track(path: &str) {
         Print("WARNING: "),
         ResetColor,
         SetAttribute(Attribute::Reset),
-        Print(format!("Failed loading track: {}\n", path))
+        Print(text),
+        Print("\n")
     ).ok();
 }
 

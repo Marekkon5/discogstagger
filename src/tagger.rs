@@ -10,15 +10,25 @@ use chrono::{NaiveDate, Datelike};
 use metaflac::block::PictureType as FLACPictureType;
 use id3::frame::PictureType as ID3PictureType;
 use id3::frame::Picture;
+use std::fs::File;
+use std::io::prelude::*;
 
 use crate::discogs::{Discogs, Track, ReleaseMaster, ReleaseType};
 use crate::ui;
+
+#[derive(Debug, Clone)]
+pub enum MusicFileType {
+    AIFF,
+    MP3,
+    FLAC
+}
 
 #[derive(Debug, Clone)]
 pub struct MusicFileInfo {
     pub path: String,
     pub title: String,
     pub artists: Vec<String>,
+    pub tag: MusicFileType 
 }
 
 #[derive(Debug, Clone)]
@@ -87,7 +97,7 @@ pub fn match_track(discogs: &mut Discogs, info: &MusicFileInfo, fuzziness: u8) -
             //Fuzzy
             fuzzy_tracks.push(((normalized_levenshtein(&clean_title(&t.title, true), &clean_title(&info.title, true)) * 100_f64) as u8, t.clone()));
         }
-        let mut fuzzy_tracks: Vec<(u8, Track)> = release.as_ref().unwrap().tracks.as_ref().unwrap().into_iter().map(|t| {
+        let mut fuzzy_tracks: Vec<(u8, Track)> = release.as_ref().unwrap().tracks.as_ref().unwrap().iter().map(|t| {
             ((normalized_levenshtein(&clean_title(&t.title, true), &clean_title(&info.title, true)) * 100_f64) as u8, t.clone())
         }).collect();
         //Sort fuzzy results
@@ -132,7 +142,7 @@ pub fn get_files(path: &str) -> Vec<MusicFileInfo> {
         match load_file_info(&f) {
             Ok(i) => Some(i),
             Err(_) => {
-                ui::print_invalid_track(&f);
+                ui::print_warning(&format!("Invalid track: {}", path));
                 None
             }
         }
@@ -149,7 +159,9 @@ pub fn load_file_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::E
 
 //Load ID3 metadata from MP3
 fn load_id3_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>> {
+    let mut tag_type = MusicFileType::MP3;
     let tag = if path.ends_with(".aif") || path.ends_with(".aiff") {
+        tag_type = MusicFileType::AIFF;
         Tag::read_from_aiff(path)?
     } else {
         Tag::read_from_path(path)?
@@ -159,11 +171,26 @@ fn load_id3_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>
         path: path.to_owned(),
         title: tag.title().ok_or("Missing title tag!")?.to_owned(),
         artists: parse_artist_tag(tag.artist().ok_or("Missing artist tag!")?),
+        tag: tag_type
     })
 }
 
 //Load FLAC meta
 fn load_flac_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error>> {
+    //Load header
+    let mut file = File::open(path)?;
+    let mut header: [u8; 4] = [0; 4];
+    file.read_exact(&mut header)?;
+    //Check for FLAC with ID3
+    if &header[0..3] == b"ID3" {
+        ui::print_warning(&format!("FLAC with ID3 tags are not supported, and should not be used. Consider converting this track metadata to Vorbis! {}", path));
+        return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "FLAC ID3 not supported!").into());
+    }
+    //Check if FLAC
+    if &header != b"fLaC" {
+        return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Not a valid FLAC!").into());
+    }
+
     let tag = metaflac::Tag::read_from_path(path)?;
     let vorbis = tag.vorbis_comments().ok_or("Missing Vorbis Comments!")?;
     //Parse artists
@@ -179,32 +206,35 @@ fn load_flac_info(path: &str) -> Result<MusicFileInfo, Box<dyn std::error::Error
     Ok(MusicFileInfo {
         path: path.to_owned(),
         title: vorbis.title().ok_or("Missing title!")?.first().ok_or("Missing title!")?.to_owned(),
-        artists
+        artists,
+        tag: MusicFileType::FLAC
     })
 }
 
 //Wrapper to write tags by format
-pub fn write_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
-    //FLAC
-    if path.to_ascii_lowercase().ends_with(".flac") {
-        write_flac_tag(discogs, config, path, release, track)?;
-        return Ok(())
-    }
-    //ID3
-    let mut tag = match path.to_ascii_lowercase().ends_with(".mp3") {
-        true => Tag::read_from_path(path)?,
-        //AIFF
-        false => Tag::read_from_aiff(path)?
+pub fn write_tag(discogs: &mut Discogs, config: &TaggerConfig, info: &MusicFileInfo, release: &ReleaseMaster, track: &Track) -> Result<(), Box<dyn std::error::Error>> {
+    //Get tag by type
+    let mut tag = match info.tag {
+        MusicFileType::FLAC => return write_flac_tag(discogs, config, &info.path, release, track),
+        MusicFileType::MP3 => {
+            Tag::read_from_path(&info.path)?
+        },
+        MusicFileType::AIFF => {
+            Tag::read_from_aiff(&info.path)?
+        }
     };
+    //Write
     write_id3_tag(&mut tag, discogs, config, release, track)?;
     let version = match config.id3v23 {
         true => Version::Id3v23,
         false => Version::Id3v24
     };
     //Save
-    match path.to_ascii_lowercase().ends_with(".mp3") {
-        true => tag.write_to_path(path, version)?,
-        false => tag.write_to_aiff(path, version)?
+    match info.tag {
+        MusicFileType::MP3 => tag.write_to_path(&info.path, version)?,
+        MusicFileType::AIFF => tag.write_to_aiff(&info.path, version)?,
+        //Shouldn't happen
+        MusicFileType::FLAC => {}
     };
 
     Ok(())
@@ -222,10 +252,10 @@ fn write_flac_tag(discogs: &mut Discogs, config: &TaggerConfig, path: &str, rele
         vorbis.set_album(vec![release.title.to_owned()]);
     }
     if config.artist && config.overwrite {
-        vorbis.set_artist(track.artists.as_ref().unwrap_or(release.artists.as_ref().unwrap())
-            .into_iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>());
+        vorbis.set_artist(track.artists.as_ref().unwrap_or_else(|| release.artists.as_ref().unwrap())
+            .iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>());
     }
-    if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || vorbis.get("LABEL").is_none()) {
+    if config.label && release.label.is_some() && !release.label.as_ref().unwrap().is_empty() && (config.overwrite || vorbis.get("LABEL").is_none()) {
         vorbis.set("LABEL", vec![clean_discogs_artist(release.label.as_ref().unwrap().first().unwrap())]);
     }
     if config.date && (config.overwrite || vorbis.get("DATE").is_none()) {
@@ -292,10 +322,10 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
         tag.set_album(&release.title);
     }
     if config.artist && config.overwrite {
-        tag.set_artist(track.artists.as_ref().unwrap_or(release.artists.as_ref().unwrap())
-            .into_iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>().join(&config.artist_separator));
+        tag.set_artist(track.artists.as_ref().unwrap_or_else(|| release.artists.as_ref().unwrap())
+            .iter().map(|a| clean_discogs_artist(a)).collect::<Vec<String>>().join(&config.artist_separator));
     }
-    if config.label && release.label.is_some() && release.label.as_ref().unwrap().len() > 0 && (config.overwrite || tag.get("TPUB").is_none()) {
+    if config.label && release.label.is_some() && !release.label.as_ref().unwrap().is_empty() && (config.overwrite || tag.get("TPUB").is_none()) {
         tag.set_text("TPUB", clean_discogs_artist(release.label.as_ref().unwrap().first().unwrap()));
     }
     if config.date && release.year.is_some() {
@@ -303,12 +333,9 @@ fn write_id3_tag(tag: &mut Tag, discogs: &mut Discogs, config: &TaggerConfig, re
         let mut month = None;
         let mut day = None;
         if release.released.is_some() && release.released.as_ref().unwrap().len() == 10 {
-            match NaiveDate::parse_from_str(release.released.as_ref().unwrap(), "%Y-%m-%d") {
-                Ok(d) => {
-                    month = Some(d.month() as u8);
-                    day = Some(d.day() as u8);
-                }
-                Err(_) => {}
+            if let Ok(d) = NaiveDate::parse_from_str(release.released.as_ref().unwrap(), "%Y-%m-%d") {
+                month = Some(d.month() as u8);
+                day = Some(d.day() as u8);
             }
         }
         //ID3v2.4

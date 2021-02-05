@@ -56,7 +56,7 @@ impl Discogs {
     fn get(&mut self, url: &str) -> Result<Response, Box<dyn std::error::Error>> {
         //Rate limit delay
         if self.rate_limit_enabled && self.last_request > 0 {
-            let now = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or(Duration::from_millis(0)).as_millis();
+            let now = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_else(|_| Duration::from_millis(0)).as_millis();
             let diff = now - self.last_request;
             //Rate limit delay in MS
             let mut delay = 1000_f64 / (self.rate_limit as f64 / 60_f64);
@@ -74,7 +74,7 @@ impl Discogs {
         let res = req.send()?;
 
         //Save request time for rate limiting
-        self.last_request = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or(Duration::from_millis(0)).as_millis();
+        self.last_request = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_else(|_| Duration::from_millis(0)).as_millis();
 
         // println!("{:?}", res.headers().get("X-Discogs-Ratelimit-Remaining"));
         Ok(res)
@@ -89,14 +89,15 @@ impl Discogs {
         //Generate url
         let mut encoder = Serializer::new(String::new());
         encoder.append_pair("type", result_type.unwrap_or("release,master"));
-        if query.is_some() {
-            encoder.append_pair("q", query.unwrap());
+        
+        if let Some(query) = query {
+            encoder.append_pair("q", query);
         }
-        if title.is_some() {
-            encoder.append_pair("title", title.unwrap());
+        if let Some(title) = title {
+            encoder.append_pair("title", title);
         }
-        if artist.is_some() {
-            encoder.append_pair("artist", artist.unwrap());
+        if let Some(artist) = artist {
+            encoder.append_pair("artist", artist);
         }
         let qp = encoder.finish();
         let url = format!("https://api.discogs.com/database/search?{}", qp);
@@ -146,17 +147,15 @@ impl SearchResults {
         for result in json["results"].as_array()? {
             //Releases
             if result["type"].as_str().unwrap_or("") == "release" {
-                match ReleaseMaster::from_json(result.to_owned(), ReleaseType::Release, None) {
-                    Some(r) => releases.push(r),
-                    None => {}
-                };
+                if let Some(r) = ReleaseMaster::from_json(result.to_owned(), ReleaseType::Release, None) {
+                    releases.push(r);
+                }
             }
             //Masters
             if result["type"].as_str().unwrap_or("") == "master" {
-                match ReleaseMaster::from_json(result.to_owned(), ReleaseType::Master, None) {
-                    Some(r) => masters.push(r),
-                    None => {}
-                };
+                if let Some(r) = ReleaseMaster::from_json(result.to_owned(), ReleaseType::Master, None) {
+                    masters.push(r);
+                }
             }
         };
 
@@ -214,9 +213,9 @@ impl ReleaseMaster {
                 Some(l) => Some(l),
                 None => {
                     match json["label"].as_array() {
-                        Some(l) => Some(l.into_iter().map(|l| l.as_str().unwrap().to_owned()).collect()),
+                        Some(l) => Some(l.iter().map(|l| l.as_str().unwrap().to_owned()).collect()),
                         None => match json["labels"].as_array() {
-                            Some(l) => Some(l.into_iter().map(|l| l["name"].as_str().unwrap().to_owned()).collect()),
+                            Some(l) => Some(l.iter().map(|l| l["name"].as_str().unwrap().to_owned()).collect()),
                             None => None
                         }
                     }
@@ -226,11 +225,11 @@ impl ReleaseMaster {
             country: json["country"].as_str().unwrap_or("").to_owned(),
             //Available only in full JSON
             artists: match json["artists"].as_array() {
-                Some(a) => Some(a.into_iter().map(|a| a["name"].as_str().unwrap().to_owned()).collect()),
+                Some(a) => Some(a.iter().map(|a| a["name"].as_str().unwrap().to_owned()).collect()),
                 None => None
             },
             extra_artists: match json["extraartists"].as_array() {
-                Some(a) => Some(a.into_iter().map(|a| a["name"].as_str().unwrap().to_owned()).collect()),
+                Some(a) => Some(a.iter().map(|a| a["name"].as_str().unwrap().to_owned()).collect()),
                 None => None
             },
             tracks: match json["tracklist"].as_array() {
@@ -283,7 +282,7 @@ impl Track {
         //Artists are available only sometimes
         let artists: Option<Vec<String>> = match json["artists"].as_array() {
             Some(a) => {
-                Some(a.into_iter().map(|a| a["name"].as_str().unwrap().to_owned()).collect())
+                Some(a.iter().map(|a| a["name"].as_str().unwrap().to_owned()).collect())
             },
             None => None
         };
@@ -293,7 +292,7 @@ impl Track {
             duration: json["duration"].as_str().unwrap().to_owned(),
             position: json["position"].as_str().unwrap().to_owned(),
             position_int: json["position"].as_str().unwrap().parse().unwrap_or(position),
-            artists: artists
+            artists
         }
     }
 }
