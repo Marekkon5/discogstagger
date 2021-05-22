@@ -2,6 +2,12 @@
 
 Simple Rust + Webview app to automatically tag your music collection using data from Discogs.
 
+# WARNING: Deprecated
+This app has been deprecated for OneTagger, because we wanted to unify all the taggers. [Github Repository](https://github.com/Marekkon5/onetagger), [Website](https://onetagger.github.io/).
+
+# Screenshot
+
+
 ![Screenshot](https://i.imgur.com/uCVeoUu.png)
 
 # Compatibility
